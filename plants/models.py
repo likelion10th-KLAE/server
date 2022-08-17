@@ -18,8 +18,8 @@ class UserPlant(models.Model):
     repot = models.IntegerField(default=0, null = True, blank = True )
     light = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null = True, blank = True )
     temperature = models.CharField(max_length=7, null = True, blank = True )
-    start_date = models.DateTimeField(auto_now_add=True)
-    last_watered = models.DateTimeField(auto_now_add=True)
+    start_date = models.DateField()
+    last_watered = models.DateField()
     created_at= models.DateTimeField(auto_now_add=True)
 
 
