@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'communities', # 커뮤니티(게시판)기능
     'journals', # 위클리 일지
     'plants', # 등록된 사용자별 식물 관련 기능
+
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,3 +130,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
