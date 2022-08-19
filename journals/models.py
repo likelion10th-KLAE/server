@@ -1,3 +1,4 @@
+'''
 from django.db import models
 from plants.models import UserPlant
 
@@ -14,3 +15,4 @@ class Diary(models.Model):
     class Meta:
         managed = False
         db_table = 'journal'
+'''

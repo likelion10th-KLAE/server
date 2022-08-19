@@ -15,9 +15,17 @@ class User(AbstractUser):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.CharField(max_length=512, null=True, blank=True)
     body = models.TextField(default="default")
-    pub_date = models.DateTimeField(auto_now_add=True)
+    growing_record = models.TextField(null = True, blank = True )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    grow_date_info = models.DateField()
+
+    class Meta:
+        managed = False
+        db_table = 'journal'
+
 
     def __str__(self):
         return self.title
