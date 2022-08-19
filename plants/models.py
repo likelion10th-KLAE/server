@@ -8,10 +8,14 @@ class Plant(models.Model):
     description =  models.TextField()
     image = models.URLField(max_length=200)
 
+    class Meta:
+        managed = False
+        db_table = 'plants'
+
 class UserPlant(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)       # user는 사용자 이름이며, User의 외래키
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)     # plant는 식물명이며, Plant의 외래키
-    species = models.CharField(max_length=50)                      # species는 식물의 종을 입력받는 속성
+    name = models.CharField(max_length=50)                      # species는 식물의 종을 입력받는 속성
     image = models.URLField(max_length=200, null = True, blank = True )
     water = models.IntegerField(default=0, null = True, blank = True )
     water_amount = models.IntegerField(default=0, null = True, blank = True )
@@ -22,4 +26,6 @@ class UserPlant(models.Model):
     last_watered = models.DateField()
     created_at= models.DateTimeField(auto_now_add=True)
 
-
+    class Meta:
+        managed = False
+        db_table = 'user_plant'
