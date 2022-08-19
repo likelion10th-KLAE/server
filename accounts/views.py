@@ -11,11 +11,10 @@ from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
+
 '''
 로그인, 로그아웃, 회원가입 관련 함수
 '''
-
-#로그인
 @api_view(['POST'])
 def login(request):
     serializer = LoginSerializer(data=request.data)
