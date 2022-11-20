@@ -19,7 +19,7 @@ class LoginSerializer(serializers.Serializer):
 class GetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title', 'image', 'body']
+        fields = ['id', 'title','body']
         read_only_fields = ['id']
 
 
@@ -29,4 +29,4 @@ class PostWritePutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'body']
-        read_only_fields = ['id']
+        read_only_fields = ['id'] 
