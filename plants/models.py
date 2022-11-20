@@ -8,9 +8,6 @@ class Plant(models.Model):
     description =  models.TextField()
     image = models.URLField(max_length=200)
 
-    class Meta:
-        managed = False
-        db_table = 'plants'
 
 class UserPlant(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)       # user는 사용자 이름이며, User의 외래키
@@ -25,7 +22,3 @@ class UserPlant(models.Model):
     start_date = models.DateField()
     last_watered = models.DateField()
     created_at= models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        managed = False
-        db_table = 'user_plant'
