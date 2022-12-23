@@ -11,19 +11,19 @@ class User(AbstractUser):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    image = models.ImageField(null=True, blank=True)
+    image = models.ImageField(null = True, upload_to="post/%Y/%m/%d")
     body = models.TextField(default="default")
     growing_record = models.TextField(null = True, blank = True )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     grow_date_info = models.DateField(null=True)
-    like_users= models.ManyToManyField(User, related_name='like_articles')
+    like_users= models.ManyToManyField(User, related_name='likepost')
 
     def __str__(self):
         return self.title
-
+    
 class Comment(models.Model):
-    article = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     content = models.CharField(null=True, max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)

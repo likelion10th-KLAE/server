@@ -12,4 +12,5 @@ urlpatterns = [
     path('write/', views.post_one_post),
     path('put/<int:pk>', views.put_one_post),
     path('delete/<int:pk>', views.delete_one_post),
+    path('post/<int:pk>/likes/', views.likes),
 ]

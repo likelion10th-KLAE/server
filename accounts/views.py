@@ -5,7 +5,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
-from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, GetSerializer
+from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, GetSerializer, LikeUsersSerializer
 from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 
@@ -112,3 +112,24 @@ def delete_one_post(request, pk):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     except Post.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def likes(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+        if post.like_users.filter(pk=request.user.id).exists():
+            post.like_users.remove(request.user)
+            serializer = LikeUsersSerializer(post)
+            return Response(serializer.data)
+        else:
+            post.like_users.add(request.user)
+            serializer = LikeUsersSerializer(post)
+            return Response(serializer.data)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+
