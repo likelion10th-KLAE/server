@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Post
+from .models import User, Post, Comment
 #회원가입
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -31,7 +31,24 @@ class PostWritePutSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'body', 'like_users']
         read_only_fields = ['id']
 
+# 좋아요
+
 class LikeUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'like_users']
+
+# 댓글 조회
+class CommentGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'user', 'content','created_at']
+        read_only_fields = ['id']
+
+# 댓글 작성
+class CommentPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'content']
+        read_only_fields = ['id']
+
