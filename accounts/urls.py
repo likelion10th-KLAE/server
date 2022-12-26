@@ -13,4 +13,7 @@ urlpatterns = [
     path('put/<int:pk>', views.put_one_post),
     path('delete/<int:pk>', views.delete_one_post),
     path('post/<int:pk>/likes/', views.likes),
+    path('comment/<int:post_id>', views.get_comments),
+    path('comment/post/<int:post_id>/', views.post_comment),
+    path('comment/delete/<int:comment_id>', views.delete_comment)
 ]
