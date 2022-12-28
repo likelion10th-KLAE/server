@@ -15,5 +15,10 @@ urlpatterns = [
     path('post/<int:pk>/likes/', views.likes),
     path('comment/<int:post_id>', views.get_comments),
     path('comment/post/<int:post_id>/', views.post_comment),
-    path('comment/delete/<int:comment_id>', views.delete_comment)
+    path('comment/delete/<int:comment_id>', views.delete_comment),
+    path('post/<int:pk>/share/', views.share),
+    path('post/page=<int:pk>',views.get_page_posts),
+    path('new_4_posts', views.new_4_posts),
+    path('likes_4_posts', views.likes_4_posts),
+    path('get_user_post/<int:pk>', views.get_user_post),
 ]
