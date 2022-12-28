@@ -1,20 +1,60 @@
-from math import perm
 from .models import User, Post, Comment
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
-from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, GetSerializer, LikeUsersSerializer,CommentGetSerializer, CommentPostSerializer
+from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, GetSerializer, LikeUsersSerializer,CommentGetSerializer, CommentPostSerializer, PageSerializer
 from django.contrib import auth
 from django.contrib.auth.hashers import make_password
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+#from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
-
-
 '''
 로그인, 로그아웃, 회원가입 관련 함수
 '''
+#공유게시판 16개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_page_posts(request, pk):
+    posts = Post.objects.filter(share=True)
+    paginator = Paginator(posts, 5)
+    page_obj = paginator.get_page(pk)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
+
+#일지공유게시판 최신 4개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def new_4_posts(request):
+    posts = Post.objects.filter(share=True).order_by('-created_at')
+    paginator = Paginator(posts, 4)
+    page_obj = paginator.get_page(1)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
+
+#일지공유게시판 공감 4개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def likes_4_posts(request):
+    posts = Post.objects.filter(share=True).order_by('-like_num')
+    paginator = Paginator(posts, 4)
+    page_obj = paginator.get_page(1)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
+
+#메인페이지 작성된 일지 유저벌로
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_post(request, pk):
+    posts = Post.objects.filter(writer=pk).order_by('-created_at')
+    serializer = GetSerializer(posts, many=True)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def login(request):
     serializer = LoginSerializer(data=request.data)
@@ -99,6 +139,27 @@ def put_one_post(request, pk):
     except Post.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+#공유하기 버튼 눌렀을 때
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def share(request, pk):
+    try:
+        post = Post.objects.get(pk=pk) 
+        if post.share == False:
+            post.share = True
+            post.save(update_fields=['share'])
+            serializer = GetSerializer(post)
+            return Response(serializer.data)
+        else:
+            post.share = False
+            post.save(update_fields=['share'])
+            serializer = GetSerializer(post)
+            return Response(serializer.data)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 #게시물 삭제
 @api_view(['DELETE'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
@@ -119,13 +180,17 @@ def delete_one_post(request, pk):
 @permission_classes([IsAuthenticated])
 def likes(request, pk):
     try:
-        post = Post.objects.get(pk=pk)
+        post = Post.objects.get(pk=pk) 
         if post.like_users.filter(pk=request.user.id).exists():
             post.like_users.remove(request.user)
+            post.like_num = post.like_users.count()
+            post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
             return Response(serializer.data)
         else:
             post.like_users.add(request.user)
+            post.like_num = post.like_users.count()
+            post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
             return Response(serializer.data)
     except Post.DoesNotExist:
@@ -156,7 +221,6 @@ def post_comment(request, post_id):
             return Response(status = status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(e)
         return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # 댓글 삭제
@@ -171,5 +235,5 @@ def delete_comment(request, comment_id):
             return Response(status = status.HTTP_200_OK)
         return Response(status = status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
-        print(e)
         return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
