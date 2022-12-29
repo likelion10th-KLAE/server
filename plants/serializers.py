@@ -4,8 +4,8 @@ from .models import *
 # 식물 추천
 class RecommendSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPlant
-        fields = ['id', 'chocie_plant']
+        model = Plant
+        fields = ['id', 'plant_name', 'description']
         read_only_fields = ['id']
 
 

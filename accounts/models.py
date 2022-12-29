@@ -7,6 +7,7 @@ class User(AbstractUser):
     email = models.CharField(max_length = 50, unique = True)
     uuid = models.CharField(max_length = 512)
     username = models.CharField(max_length = 20, unique=True)
+    select = models.CharField(max_length=50, null=True)
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
