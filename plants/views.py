@@ -58,6 +58,20 @@ def plant_put(request, pk):
     except UserPlant.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+# 식물 삭제
+@api_view(['DELETE'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_userplant(request, plant_id):
+    try:
+        comment = UserPlant.objects.get(pk = plant_id)
+        if UserPlant.user == request.user:
+            UserPlant.delete()
+            return Response(status = status.HTTP_200_OK)
+        return Response(status = status.HTTP_401_UNAUTHORIZED)
+    except UserPlant.DoesNotExist:
+        return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 #식물추천테스트
 @api_view(['GET'])
 def recommend(request,pk):
