@@ -64,9 +64,9 @@ def plant_put(request, pk):
 @permission_classes([IsAuthenticated])
 def delete_userplant(request, plant_id):
     try:
-        comment = UserPlant.objects.get(pk = plant_id)
-        if UserPlant.user == request.user:
-            UserPlant.delete()
+        plant = UserPlant.objects.get(pk = plant_id)
+        if plant.user == request.user:
+            plant.delete()
             return Response(status = status.HTTP_200_OK)
         return Response(status = status.HTTP_401_UNAUTHORIZED)
     except UserPlant.DoesNotExist:
