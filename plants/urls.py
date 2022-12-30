@@ -8,5 +8,5 @@ urlpatterns = [
     path('info/<int:pk>', plant_get),
     path('infopo/', plant_post),
     path('infoput/<int:pk>', plant_put),
-    path('recommend/', recommend),
+    path('recommend/<int:pk>',recommend),
 ]

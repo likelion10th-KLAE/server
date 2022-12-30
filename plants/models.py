@@ -6,6 +6,7 @@ class Plant(models.Model):
     plant_name = models.CharField(max_length=20, unique = True)
     description =  models.TextField()
     image = models.URLField(max_length=200)
+    plant_code = models.CharField(max_length=4, unique = True, null=True)
 
 
 class UserPlant(models.Model):
@@ -22,3 +23,4 @@ class UserPlant(models.Model):
     last_watered = models.IntegerField(default=0, null = True, blank = True )
     created_at= models.DateTimeField(auto_now_add=True)
     choice_plant = models.IntegerField(default=0, null = True, blank = True )
+
