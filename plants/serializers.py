@@ -5,7 +5,7 @@ from .models import *
 class RecommendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ['id', 'plant_name', 'description']
+        fields = ['id', 'image', 'plant_name', 'description']
         read_only_fields = ['id']
 
 
@@ -13,6 +13,6 @@ class RecommendSerializer(serializers.ModelSerializer):
 class PlantGetPostPutSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPlant
-        fields = ['id', 'name','plant','temperature','light','water_amount','repot'] # 식물 종, 식물이름, 생육온도, 일조량, 1회 급수량, 분갈이 주기
+        fields = ['id', 'name','plant','temperature','light','water_amount','repot', 'start_date', 'tonic', 'last_watered'] # 식물 종, 식물이름, 생육온도, 일조량, 1회 급수량, 분갈이 주기
         read_only_fields = ['id']
 
