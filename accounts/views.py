@@ -52,7 +52,7 @@ def likes_4_posts(request):
 @permission_classes([IsAuthenticated])
 def get_user_post(request, pk):
     posts = Post.objects.filter(writer=pk).order_by('-created_at')
-    serializer = GetSerializer(posts, many=True)
+    serializer = PageSerializer(posts, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])

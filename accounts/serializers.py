@@ -40,6 +40,7 @@ class LikeUsersSerializer(serializers.ModelSerializer):
 
 # 댓글 조회
 class CommentGetSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(use_url=True)
     class Meta:
         model = Comment, User
         fields = ['id', 'post', 'user', 'content','created_at', 'profile_image']
@@ -47,13 +48,15 @@ class CommentGetSerializer(serializers.ModelSerializer):
 
 # 댓글 작성
 class CommentPostSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(use_url=True)
     class Meta:
         model = Comment, User
         fields = ['id', 'content', 'profile_image']
         read_only_fields = ['id']
 
 class PageSerializer(serializers.ModelSerializer):
+    photo = serializers.ImageField(use_url=True)
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'image', 'like_num', 'share']
+        fields = ['id', 'title','body', 'photo', 'like_num', 'share']
         read_only_fields = ['id']
