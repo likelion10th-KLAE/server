@@ -74,8 +74,8 @@ def delete_userplant(request, plant_id):
 
 #식물추천테스트
 @api_view(['GET'])
-def recommend(request,pk):
-    user = User.objects.get(pk=pk)
+def recommend(request):
+    user = User.objects.get(pk=request.user.id)
     result = map(str, [0, 0, 0, 0]) # request.data 실험용
     result = "".join(result)
     result_plant = Plant.objects.get(plant_code=result)

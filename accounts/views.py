@@ -4,7 +4,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
-from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, GetSerializer, LikeUsersSerializer,CommentGetSerializer, CommentPostSerializer, PageSerializer
+from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, MypageSerializers ,GetSerializer, LikeUsersSerializer,CommentGetSerializer, CommentPostSerializer, PageSerializer
 from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -17,10 +17,10 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication,BasicAuthentication])
 @permission_classes([IsAuthenticated])
-def get_page_posts(request, pk):
+def get_page_posts(request, page):
     posts = Post.objects.filter(share=True)
     paginator = Paginator(posts, 5)
-    page_obj = paginator.get_page(pk)
+    page_obj = paginator.get_page(page)
     serializer = PageSerializer(page_obj, many=True)
     return Response(serializer.data)
 
@@ -50,8 +50,8 @@ def likes_4_posts(request):
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication,BasicAuthentication])
 @permission_classes([IsAuthenticated])
-def get_user_post(request, pk):
-    posts = Post.objects.filter(writer=pk).order_by('-created_at')
+def get_user_post(request):
+    posts = Post.objects.filter(writer=request.user.id).order_by('-created_at')
     serializer = PageSerializer(posts, many=True)
     return Response(serializer.data)
 
@@ -79,6 +79,23 @@ def signup(request):
         auth.login(request, new_user)
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+#마이페이지 수정, 완성 안됐습니다.
+@api_view(['PUT'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def mypage(request):
+    try:
+        user = User.objects.get(pk=request.user.id)
+        if user == request.user:
+            serializer = MypageSerializers(user, data=request.data)
+            if serializer.is_valid():
+                #serializer.save(password = make_password(serializer.validated_data['password']))
+                serializer.save(update_fields=['name','password', 'profile_image', 'email'])
+            return Response(serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
 
 #로그아웃
 @api_view(['POST'])
