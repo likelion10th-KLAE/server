@@ -7,6 +7,15 @@ class SignupSerializer(serializers.ModelSerializer):
         model = User
         fields = ['name', 'username', 'password', 'email']
 
+
+#마이페이지
+class MypageSerializers(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(use_url=True)
+    class Meta:
+        model = User
+        fields = ['name', 'username', 'password', 'email', 'profile_image']
+        read_only_fields = ['username']
+
 #로그인
 
 class LoginSerializer(serializers.Serializer):
@@ -16,16 +25,14 @@ class LoginSerializer(serializers.Serializer):
 #일지 게시물
 
 class GetSerializer(serializers.ModelSerializer):
-    photo = serializers.ImageField(use_url=True)
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'change_record', 'growing_tonic', 'like_num', 'share', 'photo']
+        fields = ['id', 'title', 'body', 'change_record', 'growing_tonic', 'like_num', 'share', 'photo']
         read_only_fields = ['id']
 
 
 #일지 게시 및 수정
 class PostWritePutSerializer(serializers.ModelSerializer):
-    photo = serializers.ImageField(use_url=True)
     class Meta:
         model = Post
         fields = ['id', 'title','body', 'change_record', 'growing_tonic', 'like_num', 'share', 'photo']
@@ -40,6 +47,7 @@ class LikeUsersSerializer(serializers.ModelSerializer):
 
 # 댓글 조회
 class CommentGetSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(use_url=True)
     class Meta:
         model = Comment, User
         fields = ['id', 'post', 'user', 'content','created_at', 'profile_image']
@@ -55,5 +63,5 @@ class CommentPostSerializer(serializers.ModelSerializer):
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'image', 'like_num', 'share']
+        fields = ['id', 'title','body', 'photo', 'like_num', 'share']
         read_only_fields = ['id']

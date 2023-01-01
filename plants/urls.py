@@ -9,6 +9,6 @@ urlpatterns = [
     path('post/', plant_post),
     path('put/<int:pk>', plant_put),
     path('delete/<int:plant_id>',delete_userplant),
-    path('recommend/<int:pk>',recommend),
+    path('recommend/',recommend),
 ]
 

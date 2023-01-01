@@ -22,7 +22,7 @@ class Post(models.Model):
     like_users = models.ManyToManyField(User, related_name='likepost', null=True)
     share = models.BooleanField(default=False)
     like_num = models.IntegerField(null=True, default=0)
-    photo = models.ImageField(upload_to='%Y/%m/%d/', null=True)
+    photo = models.ImageField(upload_to='post', null=True)
 
     def __str__(self):
         return self.title
