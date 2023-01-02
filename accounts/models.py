@@ -2,10 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    name = models.CharField(max_length = 20)
     password = models.CharField(max_length=512)
     email = models.CharField(max_length = 50, unique = True)
-    uuid = models.CharField(max_length = 512)
     username = models.CharField(max_length = 20, unique=True)
     select = models.CharField(max_length=50, null=True)
     profile_image = models.ImageField(upload_to='profile', null=True)
@@ -34,6 +32,5 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     profile_comment = models.ImageField(null=True)
-
     def __str__(self):
         return self.content

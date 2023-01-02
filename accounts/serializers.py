@@ -5,19 +5,25 @@ from .models import User, Post, Comment
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name', 'username', 'password', 'email']
+        fields = ['username', 'password', 'email']
 
 
 #마이페이지
 class MypageSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name','password', 'email', 'profile_image']
+        fields = ['username','password', 'email', 'profile_image']
+
+#마이페이지
+class MypagePuterializers(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','password', 'profile_image']
 
 #로그인
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required = True)
+    email = serializers.CharField(required = True)
     password = serializers.CharField(required = True)
 
 #일지 게시물

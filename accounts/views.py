@@ -11,49 +11,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 #from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 '''
-로그인, 로그아웃, 회원가입 관련 함수
+로그인, 로그아웃, 회원가입, 마이페이지 관련 함수
 '''
-#공유게시판 16개
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def get_page_posts(request, page):
-    posts = Post.objects.filter(share=True)
-    paginator = Paginator(posts, 5)
-    page_obj = paginator.get_page(page)
-    serializer = PageSerializer(page_obj, many=True)
-    return Response(serializer.data)
-
-#일지공유게시판 최신 4개
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def new_4_posts(request):
-    posts = Post.objects.filter(share=True).order_by('-created_at')
-    paginator = Paginator(posts, 4)
-    page_obj = paginator.get_page(1)
-    serializer = PageSerializer(page_obj, many=True)
-    return Response(serializer.data)
-
-#일지공유게시판 공감 4개
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def likes_4_posts(request):
-    posts = Post.objects.filter(share=True).order_by('-like_num')
-    paginator = Paginator(posts, 4)
-    page_obj = paginator.get_page(1)
-    serializer = PageSerializer(page_obj, many=True)
-    return Response(serializer.data)
-
-#메인페이지 작성된 일지 유저벌로
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def get_user_post(request):
-    posts = Post.objects.filter(writer=request.user.id).order_by('-created_at')
-    serializer = PageSerializer(posts, many=True)
-    return Response(serializer.data)
 
 @api_view(['POST'])
 def login(request):
@@ -61,7 +20,7 @@ def login(request):
     if serializer.is_valid():
         user = auth.authenticate(
             request=request,
-            username=serializer.data['username'],
+            email=serializer.data['username'],
             password=serializer.data['password']
         )
         if user is not None:
@@ -102,6 +61,41 @@ def mypage(request):
 def logout(request):
     auth.logout(request)
     return Response(status=status.HTTP_200_OK)
+'''
+페이지네이션 관련 함수
+'''
+#공유게시판 16개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_page_posts(request, page):
+    posts = Post.objects.filter(share=True)
+    paginator = Paginator(posts, 5)
+    page_obj = paginator.get_page(page)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
+
+#일지공유게시판 최신 4개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def new_4_posts(request):
+    posts = Post.objects.filter(share=True).order_by('-created_at')
+    paginator = Paginator(posts, 4)
+    page_obj = paginator.get_page(1)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
+
+#일지공유게시판 공감 4개
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def likes_4_posts(request):
+    posts = Post.objects.filter(share=True).order_by('-like_num')
+    paginator = Paginator(posts, 4)
+    page_obj = paginator.get_page(1)
+    serializer = PageSerializer(page_obj, many=True)
+    return Response(serializer.data)
 
 '''
 마이페이지 관련 함수
@@ -213,12 +207,25 @@ def likes(request, pk):
     except Post.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+#메인페이지- 작성된 일지 유저벌로
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_post(request):
+    posts = Post.objects.filter(writer=request.user.id).order_by('-created_at')
+    serializer = PageSerializer(posts, many=True)
+    return Response(serializer.data)
+'''
+댓글 관련 함수
+'''
 
 # 댓글 조회
 @api_view(['GET'])
 def get_comments(request, post_id):
     try:
         comments = Comment.objects.filter(post__id = post_id)
+        for comment in comments:
+            comment.profile_comment = comment.user.profile_image
         serializer = CommentGetSerializer(comments, many = True)
         return Response(serializer.data, status = status.HTTP_200_OK)
     except Post.DoesNotExist:
@@ -233,7 +240,7 @@ def post_comment(request, post_id):
         serializer = CommentPostSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_authenticated :
-                serializer.save(user=request.user, post_id = post_id, profile_comment = request.user.profile_image)
+                serializer.save(user=request.user, post_id = post_id)
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             return Response(status = status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
