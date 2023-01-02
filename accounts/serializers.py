@@ -10,11 +10,9 @@ class SignupSerializer(serializers.ModelSerializer):
 
 #마이페이지
 class MypageSerializers(serializers.ModelSerializer):
-    profile_image = serializers.ImageField(use_url=True)
     class Meta:
         model = User
-        fields = ['name', 'username', 'password', 'email', 'profile_image']
-        read_only_fields = ['username']
+        fields = ['name','password', 'email', 'profile_image']
 
 #로그인
 
@@ -47,19 +45,19 @@ class LikeUsersSerializer(serializers.ModelSerializer):
 
 # 댓글 조회
 class CommentGetSerializer(serializers.ModelSerializer):
-    profile_image = serializers.ImageField(use_url=True)
     class Meta:
-        model = Comment, User
-        fields = ['id', 'post', 'user', 'content','created_at', 'profile_image']
+        model = Comment
+        fields = ['id', 'post', 'user', 'content','created_at','profile_comment']
         read_only_fields = ['id']
 
 # 댓글 작성
 class CommentPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment, User
-        fields = ['id', 'content', 'profile_image']
+        model = Comment
+        fields = ['id', 'content']
         read_only_fields = ['id']
-
+        
+#페이지네이션 목록
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post

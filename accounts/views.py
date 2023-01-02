@@ -80,7 +80,7 @@ def signup(request):
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#마이페이지 수정, 완성 안됐습니다.
+#마이페이지 수정
 @api_view(['PUT'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
@@ -90,12 +90,12 @@ def mypage(request):
         if user == request.user:
             serializer = MypageSerializers(user, data=request.data)
             if serializer.is_valid():
-                #serializer.save(password = make_password(serializer.validated_data['password']))
-                serializer.save(update_fields=['name','password', 'profile_image', 'email'])
-            return Response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    except User.DoesNotExist:
-        return Response(status = status.HTTP_404_NOT_FOUND)
+                serializer.save(password = make_password(serializer.validated_data['password']))
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 #로그아웃
 @api_view(['POST'])
@@ -233,7 +233,7 @@ def post_comment(request, post_id):
         serializer = CommentPostSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_authenticated :
-                serializer.save(user=request.user, post_id = post_id)
+                serializer.save(user=request.user, post_id = post_id, profile_comment = request.user.profile_image)
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             return Response(status = status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_400_BAD_REQUEST)

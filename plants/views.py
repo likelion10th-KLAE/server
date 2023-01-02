@@ -16,6 +16,14 @@ def plant_get_all(request):
     serializer = PlantGetPostPutSerializer(plants, many=True)
     return Response(serializer.data)
 
+# (개발용)식물데이터 전체 조회
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def plant_db(request):
+    plant = Plant.objects.all()
+    serializer = RecommendSerializer(plant, many=True)
+    return Response(serializer.data)
 
 
 # 등록 식물 조회
@@ -76,7 +84,7 @@ def delete_userplant(request, plant_id):
 @api_view(['GET'])
 def recommend(request):
     user = User.objects.get(pk=request.user.id)
-    result = map(str, [0, 0, 0, 0]) # request.data 실험용
+    result = map(str, request.data)
     result = "".join(result)
     result_plant = Plant.objects.get(plant_code=result)
     user.select = result_plant.id
