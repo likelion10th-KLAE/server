@@ -4,7 +4,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
-from .serializers import LoginSerializer, PostWritePutSerializer, SignupSerializer, MypageSerializers ,GetSerializer, LikeUsersSerializer,CommentGetSerializer, CommentPostSerializer, PageSerializer
+from .serializers import *
 from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -20,7 +20,7 @@ def login(request):
     if serializer.is_valid():
         user = auth.authenticate(
             request=request,
-            email=serializer.data['username'],
+            email=serializer.data['email'],
             password=serializer.data['password']
         )
         if user is not None:
@@ -39,21 +39,33 @@ def signup(request):
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#마이페이지 수정
-@api_view(['PUT'])
+#마이페이지 조회
+@api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def mypage(request):
     try:
         user = User.objects.get(pk=request.user.id)
+        serializer = MypageSerializers(user)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+#마이페이지 수정
+@api_view(['PUT'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def mypage_put(request):
+    try:
+        user = User.objects.get(pk=request.user.id)
         if user == request.user:
-            serializer = MypageSerializers(user, data=request.data)
+            serializer = MypagePutserializers(user, data=request.data)
             if serializer.is_valid():
                 serializer.save(password = make_password(serializer.validated_data['password']))
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-    except Post.DoesNotExist:
+    except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 #로그아웃
@@ -98,7 +110,7 @@ def likes_4_posts(request):
     return Response(serializer.data)
 
 '''
-마이페이지 관련 함수
+일지 관련 함수
 '''
 
 #전체 게시물 조회
@@ -117,6 +129,9 @@ def get_all_posts(request):
 def get_one_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
+        comments = Comment.objects.filter(post__id = pk)
+        post.comment_cnt = comments.count()
+        post.save(update_fields=['comment_cnt'])
         serializer = GetSerializer(post)
         return Response(serializer.data)
     except Post.DoesNotExist:
@@ -130,7 +145,7 @@ def post_one_post(request):
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(writer = request.user)
-        return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(status = status.HTTP_201_CREATED)
     return Response(status = status.HTTP_400_BAD_REQUEST)
 
 #게시물 수정
@@ -191,7 +206,7 @@ def delete_one_post(request, pk):
 @permission_classes([IsAuthenticated])
 def likes(request, pk):
     try:
-        post = Post.objects.get(pk=pk) 
+        post = Post.objects.get(pk=pk)
         if post.like_users.filter(pk=request.user.id).exists():
             post.like_users.remove(request.user)
             post.like_num = post.like_users.count()
@@ -261,3 +276,17 @@ def delete_comment(request, comment_id):
     except Exception as e:
         return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+#댓글 수만 보내주기
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_comment_cnt(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+        comments = Comment.objects.filter(post__id = pk)
+        post.comment_cnt = comments.count()
+        post.save(update_fields=['comment_cnt'])
+        serializer = CommentCntSerializer(post)
+        return Response(serializer.data)
+    except Post.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)

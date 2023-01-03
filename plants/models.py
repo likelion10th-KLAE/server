@@ -24,4 +24,6 @@ class UserPlant(models.Model):
     created_at= models.DateTimeField(auto_now_add=True)
     choice_plant = models.IntegerField(default=0, null = True, blank = True )
     tonic = models.IntegerField(default=0, null = True, blank = True )
+    extra1 = models.CharField(max_length=50, null=True, blank=True)
+    extra2 = models.CharField(max_length=50, null=True, blank=True)
 

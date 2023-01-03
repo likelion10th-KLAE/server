@@ -15,6 +15,6 @@ class PlantGetPostPutSerializer(serializers.ModelSerializer):
     userplant_image = serializers.ImageField(use_url=True)
     class Meta:
         model = UserPlant
-        fields = ['id', 'name','plant','userplant_image','temperature','light','water_amount','repot', 'start_date', 'tonic', 'last_watered'] # 식물 종, 식물이름, 생육온도, 일조량, 1회 급수량, 분갈이 주기
+        fields = ['id', 'plant', 'name','userplant_image', 'temperature', 'light', 'water_amount', 'last_watered', 'tonic','repot', 'start_date', 'extra1', 'extra2'] # 식물 종, 식물이름, 생육온도, 일조량, 1회 급수량, 분갈이 주기
         read_only_fields = ['id']
 
