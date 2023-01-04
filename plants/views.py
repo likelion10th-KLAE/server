@@ -80,7 +80,7 @@ def delete_userplant(request, plant_id):
     except UserPlant.DoesNotExist:
         return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#식물추천테스트
+#식물추천
 @api_view(['GET'])
 def recommend(request):
     user = User.objects.get(pk=request.user.id)

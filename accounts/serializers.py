@@ -5,19 +5,25 @@ from .models import User, Post, Comment
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name', 'username', 'password', 'email']
+        fields = ['username', 'password', 'email']
 
 
 #마이페이지
 class MypageSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name','password', 'email', 'profile_image']
+        fields = ['email', 'password', 'username','profile_image']
+
+#마이페이지수정
+class MypagePutserializers(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['password', 'username', 'profile_image']
 
 #로그인
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required = True)
+    email = serializers.CharField(required = True)
     password = serializers.CharField(required = True)
 
 #일지 게시물
@@ -25,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
 class GetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title', 'body', 'change_record', 'growing_tonic', 'like_num', 'share', 'photo']
+        fields = ['id', 'title', 'body','give_water','change_record', 'growing_tonic', 'like_num', 'share', 'photo', 'comment_cnt']
         read_only_fields = ['id']
 
 
@@ -33,7 +39,7 @@ class GetSerializer(serializers.ModelSerializer):
 class PostWritePutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'change_record', 'growing_tonic', 'like_num', 'share', 'photo']
+        fields = ['id', 'title','body','give_water','change_record', 'growing_tonic', 'photo']
         read_only_fields = ['id']
 
 # 좋아요
@@ -56,10 +62,16 @@ class CommentPostSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'content']
         read_only_fields = ['id']
+
+#댓글 하나 달았을 때, 댓글 개수 보내기
+class CommentCntSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'comment_cnt']
         
 #페이지네이션 목록
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'photo', 'like_num', 'share']
+        fields = ['id', 'title','body', 'photo', 'like_num', 'share', 'created_at']
         read_only_fields = ['id']
