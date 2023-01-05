@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework import status
 from .models import *
-from .serializers import RecommendSerializer,PlantGetPostPutSerializer
+from .serializers import *
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from datetime import datetime
 
 # 등록한 식물 전체 조회
 @api_view(['GET'])
@@ -90,6 +91,15 @@ def recommend(request):
     user.select = result_plant.id
     user.save(update_fields=['select'])
     serializer = RecommendSerializer(result_plant)
+    return Response(serializer.data)
+
+#마이페이지 사이드바 - 유저에 맞는(생성한) 식물 리스트
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication,BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user_plants(request):
+    plants = UserPlant.objects.filter(user=request.user.id).order_by('-created_at')
+    serializer = UserPlantsSidebar(plants, many=True)
     return Response(serializer.data)
 
 

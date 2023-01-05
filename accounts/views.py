@@ -1,4 +1,5 @@
 from .models import User, Post, Comment
+from plants.models import UserPlant
 from rest_framework import status, generics
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -8,6 +9,7 @@ from .serializers import *
 from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from datetime import datetime
 #from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 '''
@@ -130,8 +132,14 @@ def get_one_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
         comments = Comment.objects.filter(post__id = pk)
+        userplant = UserPlant.objects.get(pk=post.user_plant)
         post.comment_cnt = comments.count()
-        post.save(update_fields=['comment_cnt'])
+        
+        date = userplant.created_at.replace(tzinfo=None)
+        now = datetime.now().replace(tzinfo=None)
+        post.ndate = (now - date).days + 1
+
+        post.save(update_fields=['comment_cnt', 'ndate'])
         serializer = GetSerializer(post)
         return Response(serializer.data)
     except Post.DoesNotExist:
@@ -141,10 +149,10 @@ def get_one_post(request, pk):
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
-def post_one_post(request):
+def post_one_post(request, user_plant_id):
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(writer = request.user)
+        serializer.save(writer = request.user, user_plant=user_plant_id) #1 = request.data
         return Response(status = status.HTTP_201_CREATED)
     return Response(status = status.HTTP_400_BAD_REQUEST)
 
@@ -222,14 +230,19 @@ def likes(request, pk):
     except Post.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-#메인페이지- 작성된 일지 유저벌로
+#식물별 작성된 일지 모아주기
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication,BasicAuthentication])
 @permission_classes([IsAuthenticated])
-def get_user_post(request):
-    posts = Post.objects.filter(writer=request.user.id).order_by('-created_at')
+def get_userplant_post(request, user_plant_id):
+    posts = Post.objects.filter(user_plant=user_plant_id).order_by('-created_at')
+    userplant = UserPlant.objects.get(pk=user_plant_id)
+    date = userplant.created_at.replace(tzinfo=None)
+    now = datetime.now().replace(tzinfo=None)
+    posts.ndate = (now - date).days + 1
     serializer = PageSerializer(posts, many=True)
     return Response(serializer.data)
+
 '''
 댓글 관련 함수
 '''
@@ -283,8 +296,7 @@ def delete_comment(request, comment_id):
 def get_comment_cnt(request, pk):
     try:
         post = Post.objects.get(pk=pk)
-        comments = Comment.objects.filter(post__id = pk)
-        post.comment_cnt = comments.count()
+        post.comment_cnt += 1
         post.save(update_fields=['comment_cnt'])
         serializer = CommentCntSerializer(post)
         return Response(serializer.data)

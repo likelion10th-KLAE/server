@@ -13,6 +13,7 @@ class User(AbstractUser):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user_plant = models.IntegerField(null=True)
     body = models.TextField(default="default")
     give_water = models.TextField(null = True, blank = True)
     change_record = models.TextField(null = True, blank = True )
@@ -25,7 +26,8 @@ class Post(models.Model):
     like_num = models.IntegerField(null=True, default=0)
     photo = models.ImageField(upload_to='post', null=True)
     comment_cnt = models.IntegerField(null=True, default=0)
-
+    ndate = models.IntegerField(default=0, null=True, blank=True)
+    
     def __str__(self):
         return self.title
     

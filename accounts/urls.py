@@ -9,7 +9,7 @@ urlpatterns = [
     path('logout/', views.logout),
     path('post/', views.get_all_posts),
     path('post/<int:pk>', views.get_one_post),
-    path('write/', views.post_one_post),
+    path('write/<int:user_plant_id>', views.post_one_post),
     path('put/<int:pk>', views.put_one_post),
     path('delete/<int:pk>', views.delete_one_post),
     path('mypage_put/', views.mypage_put),
@@ -23,5 +23,5 @@ urlpatterns = [
     path('post/page=<int:page>',views.get_page_posts),
     path('new_4_posts', views.new_4_posts),
     path('likes_4_posts', views.likes_4_posts),
-    path('get_user_post/', views.get_user_post),
+    path('get_user_post/<int:user_plant_id>', views.get_userplant_post),
 ]
