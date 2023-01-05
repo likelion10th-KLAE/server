@@ -11,5 +11,6 @@ urlpatterns = [
     path('delete/<int:plant_id>',delete_userplant),
     path('recommend/',recommend),
     path('plant_db/',plant_db),
+    path('get_user_plants/',get_user_plants),
 ]
 
