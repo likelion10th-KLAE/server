@@ -10,8 +10,8 @@ from datetime import datetime
 
 # 등록한 식물 전체 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def plant_get_all(request):
     plants = UserPlant.objects.all()
     serializer = PlantGetPostPutSerializer(plants, many=True)
@@ -19,8 +19,8 @@ def plant_get_all(request):
 
 # (개발용)식물데이터 전체 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def plant_db(request):
     plant = Plant.objects.all()
     serializer = RecommendSerializer(plant, many=True)
@@ -29,8 +29,8 @@ def plant_db(request):
 
 # 등록 식물 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def plant_get(request, pk):
     try:
         plantinfo = UserPlant.objects.get(pk=pk)
@@ -41,8 +41,8 @@ def plant_get(request, pk):
 
 # 식물 등록 
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def plant_post(request):
     serializer = PlantGetPostPutSerializer(data=request.data)
     if serializer.is_valid():
@@ -52,8 +52,8 @@ def plant_post(request):
 
 # 등록 식물 수정
 @api_view(['PUT'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def plant_put(request, pk):
     try:
         plantinfo = UserPlant.objects.get(pk=pk)
@@ -69,8 +69,8 @@ def plant_put(request, pk):
 
 # 식물 삭제
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def delete_userplant(request, plant_id):
     try:
         plant = UserPlant.objects.get(pk = plant_id)
@@ -95,8 +95,8 @@ def recommend(request):
 
 #마이페이지 사이드바 - 유저에 맞는(생성한) 식물 리스트
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_user_plants(request):
     plants = UserPlant.objects.filter(user=request.user.id).order_by('-created_at')
     serializer = UserPlantsSidebar(plants, many=True)

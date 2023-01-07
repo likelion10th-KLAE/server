@@ -43,8 +43,8 @@ def signup(request):
 
 #마이페이지 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def mypage(request):
     try:
         user = User.objects.get(pk=request.user.id)
@@ -55,8 +55,8 @@ def mypage(request):
 
 #마이페이지 수정
 @api_view(['PUT'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def mypage_put(request):
     try:
         user = User.objects.get(pk=request.user.id)
@@ -80,19 +80,23 @@ def logout(request):
 '''
 #공유게시판 16개
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_page_posts(request, page):
-    posts = Post.objects.filter(share=True)
-    paginator = Paginator(posts, 5)
+    posts = Post.objects.filter(share=True).order_by('-created_at')
+    paginator = Paginator(posts, 16)
     page_obj = paginator.get_page(page)
+    for post in posts:
+        post.page_range = paginator.num_pages
+        post.save(update_fields=['page_range'])
+
     serializer = PageSerializer(page_obj, many=True)
     return Response(serializer.data)
 
 #일지공유게시판 최신 4개
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def new_4_posts(request):
     posts = Post.objects.filter(share=True).order_by('-created_at')
     paginator = Paginator(posts, 4)
@@ -102,8 +106,8 @@ def new_4_posts(request):
 
 #일지공유게시판 공감 4개
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def likes_4_posts(request):
     posts = Post.objects.filter(share=True).order_by('-like_num')
     paginator = Paginator(posts, 4)
@@ -117,8 +121,8 @@ def likes_4_posts(request):
 
 #전체 게시물 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_all_posts(request):
     posts = Post.objects.all()
     serializer = GetSerializer(posts, many=True)
@@ -126,8 +130,8 @@ def get_all_posts(request):
 
 #한 게시물 조회
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_one_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
@@ -148,8 +152,8 @@ def get_one_post(request, pk):
 
 #게시물 업로드
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def post_one_post(request, user_plant_id):
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
@@ -159,8 +163,8 @@ def post_one_post(request, user_plant_id):
 
 #게시물 수정
 @api_view(['PUT'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def put_one_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
@@ -176,8 +180,8 @@ def put_one_post(request, pk):
 
 #공유하기 버튼 눌렀을 때
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def share(request, pk):
     try:
         post = Post.objects.get(pk=pk) 
@@ -197,8 +201,8 @@ def share(request, pk):
 
 #게시물 삭제
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def delete_one_post(request, pk):
     try:
         post = Post.objects.get(pk=pk)
@@ -211,8 +215,8 @@ def delete_one_post(request, pk):
 
 # 좋아요
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def likes(request, pk):
     try:
         post = Post.objects.get(pk=pk)
@@ -233,8 +237,8 @@ def likes(request, pk):
 
 #식물별 작성된 일지 모아주기
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_userplant_post(request, user_plant_id):
     posts = Post.objects.filter(user_plant=user_plant_id).order_by('-created_at')
     userplant = UserPlant.objects.get(pk=user_plant_id)
@@ -262,8 +266,8 @@ def get_comments(request, post_id):
 
 # 댓글 업로드
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def post_comment(request, post_id):
     try:
         serializer = CommentPostSerializer(data=request.data)
@@ -278,8 +282,8 @@ def post_comment(request, post_id):
 
 # 댓글 삭제
 @api_view(['DELETE'])
-@authentication_classes([SessionAuthentication,BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def delete_comment(request, comment_id):
     try:
         comment = Comment.objects.get(pk = comment_id)
@@ -292,8 +296,8 @@ def delete_comment(request, comment_id):
 
 #댓글 수만 보내주기
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def get_comment_cnt(request, pk):
     try:
         post = Post.objects.get(pk=pk)
