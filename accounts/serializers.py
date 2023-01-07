@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Post, Comment
+from .models import *
 #회원가입
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
 class GetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title', 'body','give_water','change_record', 'growing_tonic', 'like_num', 'share', 'photo', 'comment_cnt', 'ndate']
+        fields = ['id', 'title', 'body','give_water','change_record', 'growing_tonic', 'like_num', 'share', 'photo', 'comment_cnt', 'ndate', 'user_plant_name']
         read_only_fields = ['id']
 
 
@@ -73,5 +73,11 @@ class CommentCntSerializer(serializers.ModelSerializer):
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title','body', 'photo', 'like_num', 'share', 'created_at', 'ndate']
+        fields = ['id', 'title','body', 'photo', 'like_num', 'share', 'created_at', 'ndate', 'page_range']
         read_only_fields = ['id']
+
+class Paginate(serializers.ModelSerializer):
+    post = PageSerializer(many=True)
+    class Meta:
+        model = Post
+        fields = ['page_range','post']

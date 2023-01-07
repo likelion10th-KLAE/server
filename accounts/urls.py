@@ -23,5 +23,5 @@ urlpatterns = [
     path('post/page=<int:page>',views.get_page_posts),
     path('new_4_posts', views.new_4_posts),
     path('likes_4_posts', views.likes_4_posts),
-    path('get_user_post/<int:user_plant_id>', views.get_userplant_post),
+    path('get_userplant_post/<int:user_plant_id>', views.get_userplant_post),
 ]

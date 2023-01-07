@@ -133,13 +133,14 @@ def get_one_post(request, pk):
         post = Post.objects.get(pk=pk)
         comments = Comment.objects.filter(post__id = pk)
         userplant = UserPlant.objects.get(pk=post.user_plant)
+        post.user_plant_name = userplant.name
         post.comment_cnt = comments.count()
         
         date = userplant.created_at.replace(tzinfo=None)
         now = datetime.now().replace(tzinfo=None)
         post.ndate = (now - date).days + 1
 
-        post.save(update_fields=['comment_cnt', 'ndate'])
+        post.save(update_fields=['comment_cnt', 'ndate', 'user_plant_name'])
         serializer = GetSerializer(post)
         return Response(serializer.data)
     except Post.DoesNotExist:
@@ -152,7 +153,7 @@ def get_one_post(request, pk):
 def post_one_post(request, user_plant_id):
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(writer = request.user, user_plant=user_plant_id) #1 = request.data
+        serializer.save(writer = request.user, user_plant=user_plant_id) #1 = request.data, 향후 user_plant_id로 저장할지, request.data로 할지 논의 필요
         return Response(status = status.HTTP_201_CREATED)
     return Response(status = status.HTTP_400_BAD_REQUEST)
 
@@ -302,3 +303,4 @@ def get_comment_cnt(request, pk):
         return Response(serializer.data)
     except Post.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
+
