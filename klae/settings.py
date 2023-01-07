@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import pymysql
+import os
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +30,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,11 +44,25 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts', # 유저 관련
-    'communities', # 커뮤니티(게시판)기능
-    'journals', # 위클리 일지
     'plants', # 등록된 사용자별 식물 관련 기능
-
+    'storages',
+    'django.contrib.sites',
+    'corsheaders',
 ]
+
+###########################AWS
+AWS_ACCESS_KEY_ID = 'AKIARQ2XS3DPXR62CKPO' # .csv 파일에 있는 내용을 입력 Access key ID
+AWS_SECRET_ACCESS_KEY = 'bbGl+15dtJOXVBOh4Ew/f6Xn+KIkbtTf1K0PeQ9S' # .csv 파일에 있는 내용을 입력 Secret access key
+AWS_REGION = 'ap-northeast-2'
+
+###S3 Storages
+AWS_STORAGE_BUCKET_NAME = 'klae-buket' # 설정한 버킷 이름
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME,AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -56,8 +74,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
-
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+]
 ROOT_URLCONF = 'klae.urls'
 
 TEMPLATES = [
@@ -84,8 +106,15 @@ WSGI_APPLICATION = 'klae.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', # engine: mysql
+        'NAME' : 'KLAE', # DB Name
+        'USER' : 'root', # DB User
+        'PASSWORD' : 'klae##$$KLAE', # Password
+        'HOST': 'klae.cib6raq9qb8y.ap-northeast-2.rds.amazonaws.com', # 생성한 데이터베이스 엔드포인트
+        'PORT': '3306', # 데이터베이스 포트
+        'OPTIONS':{
+            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
@@ -131,3 +160,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+    "DATETIME_FORMAT": '%Y-%m-%d %H:%M:%S', 
+}
