@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'accounts', # 유저 관련
     'plants', # 등록된 사용자별 식물 관련 기능
     'storages',
-    'django.contrib.sites',
     'corsheaders',
 ]
 
@@ -153,7 +152,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
