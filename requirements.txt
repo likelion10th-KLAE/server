@@ -33,7 +33,6 @@ idna==3.4
 jmespath==1.0.1
 jquery.javascript==1.0.0
 multipart==0.2.4
-mysqlclient==2.1.1
 oauthlib==3.2.2
 outcome==1.2.0
 paramiko==2.12.0
