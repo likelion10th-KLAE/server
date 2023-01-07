@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'accounts', # 유저 관련
     'plants', # 등록된 사용자별 식물 관련 기능
     'storages',
-    'django.contrib.sites',
     'corsheaders',
 ]
 
