@@ -65,6 +65,7 @@ class login(APIView):
                 {
                     "user" : serializer.data['email'],
                     "message" : "로그인 성공!",
+                    "profile": user.profile_image.url,
                     "token" : {
                         "access" : access_token,
                         "refresh" : refresh_token,
