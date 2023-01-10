@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'plants', # 등록된 사용자별 식물 관련 기능
     'storages',
     'corsheaders',
+    'rest_framework_jwt',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 ]
 
 ###########################AWS
@@ -142,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -164,3 +167,8 @@ REST_FRAMEWORK = {
     "DATETIME_FORMAT": '%Y-%m-%d %H:%M:%S', 
 }
 
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}

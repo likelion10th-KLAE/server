@@ -10,36 +10,72 @@ from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from datetime import datetime
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.views import APIView
 #from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 '''
 로그인, 로그아웃, 회원가입, 마이페이지 관련 함수
 '''
 
-@api_view(['POST'])
-def login(request):
-    serializer = LoginSerializer(data=request.data)
-    if serializer.is_valid():
-        user = auth.authenticate(
-            request=request,
-            email=serializer.data['email'],
-            password=serializer.data['password']
-        )
+"""
+토큰회원가입
+"""
+class signup(APIView):
+    def post(self, request):
+        serializer = SignupSerializer(data=request.data)
+        if serializer.is_valid():
+            signup_user = serializer.save(password = make_password(serializer.validated_data['password']))
+            token = TokenObtainPairSerializer.get_token(signup_user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            res = Response(
+                {
+                    "user" : serializer.data['username'],
+                    "message" : "회원가입 완료!",
+                    "token" : {
+                        "access" : access_token,
+                        "refresh" : refresh_token,
+                    }
+                },
+                status = status.HTTP_200_OK
+            )
+            res.set_cookie("access", access_token, httponly=True)
+            res.set_cookie("refresh", refresh_token, httponly=True)
+            auth.login(request, signup_user)
+            return res
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+"""
+토큰 로그인
+"""
+class login(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.get(email=serializer.data["email"])
+            # if not check_password(request.data['password'], user.password):
+            #     return Response({"msg" : "비밀번호가 틀렸습니다"}, status=status.HTTP_400_BAD_REQUEST)
         if user is not None:
             auth.login(request, user)
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+            token = TokenObtainPairSerializer.get_token(user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            res = Response(
+                {
+                    "user" : serializer.data['email'],
+                    "message" : "로그인 성공!",
+                    "token" : {
+                        "access" : access_token,
+                        "refresh" : refresh_token,
+                    },
+                },
+                status=status.HTTP_200_OK
+            )
+            return res
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#회원가입
-@api_view(['POST'])
-def signup(request):
-    serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid():
-        new_user = serializer.save(password = make_password(serializer.validated_data['password']))
-        auth.login(request, new_user)
-        return Response(status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 #마이페이지 조회
 @api_view(['GET'])
