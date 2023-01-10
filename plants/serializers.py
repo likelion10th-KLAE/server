@@ -5,7 +5,7 @@ from .models import *
 class RecommendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ['id', 'plant_image', 'plant_name', 'description']
+        fields = ['id', 'plant_image', 'plant_name', 'description', 'difficulty', 'plant_function', 'hydroponics']
         read_only_fields = ['id']
 
 
@@ -20,4 +20,10 @@ class UserPlantsSidebar(serializers.ModelSerializer):
     class Meta:
         model = UserPlant
         fields = ['id', 'name']
+        read_only_fields = ['id']
+
+class GetUserPick(serializers.ModelSerializer):
+    class Meta:
+        model = UserPick
+        fields = ['id', 'result']
         read_only_fields = ['id']

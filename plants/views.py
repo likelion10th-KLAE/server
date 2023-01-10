@@ -80,18 +80,19 @@ def delete_userplant(request, plant_id):
         return Response(status = status.HTTP_401_UNAUTHORIZED)
     except UserPlant.DoesNotExist:
         return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-#식물추천
-@api_view(['GET'])
+# 식물 등록 
+@api_view(['POST'])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def recommend(request):
-    user = User.objects.get(pk=request.user.id)
-    result = map(str, request.data)
-    result = "".join(result)
-    result_plant = Plant.objects.get(plant_code=result)
-    user.select = result_plant.id
-    user.save(update_fields=['select'])
-    serializer = RecommendSerializer(result_plant)
-    return Response(serializer.data)
+    result_serializer = GetUserPick(data=request.data)
+    if result_serializer.is_valid():
+        result = result_serializer.data['result']
+        result_plant = Plant.objects.get(plant_code=result)
+        serializer = RecommendSerializer(result_plant)
+        return Response(serializer.data)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 #마이페이지 사이드바 - 유저에 맞는(생성한) 식물 리스트
 @api_view(['GET'])
