@@ -7,6 +7,9 @@ class Plant(models.Model):
     description =  models.TextField()
     plant_image = models.ImageField(upload_to='plant', null=True)
     plant_code = models.CharField(max_length=4, unique = True, null=True)
+    difficulty = models.CharField(max_length=10, null=True)
+    plant_function = models.CharField(max_length=10, null=True)
+    hydroponics = models.CharField(max_length=10, null=True)
 
 
 class UserPlant(models.Model):
@@ -27,3 +30,5 @@ class UserPlant(models.Model):
     extra1 = models.CharField(max_length=50, null=True, blank=True)
     extra2 = models.CharField(max_length=50, null=True, blank=True)
 
+class UserPick(models.Model):
+    result = models.CharField(max_length=50)
