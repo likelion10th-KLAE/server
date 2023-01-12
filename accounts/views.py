@@ -106,12 +106,10 @@ def mypage(request):
 def mypage_put(request):
     try:
         user = get_token_user(request)
-        if user == request.user:
-            serializer = MypagePutserializers(user, data=request.data)
-            if serializer.is_valid():
-                serializer.save(password = make_password(serializer.validated_data['password']))
-                return Response(status=status.HTTP_200_OK)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = MypagePutserializers(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save(password = make_password(serializer.validated_data['password']))
+            return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -201,10 +199,10 @@ def get_one_post(request, pk):
 #@authentication_classes([SessionAuthentication, BasicAuthentication])
 #@permission_classes([IsAuthenticated])
 def post_one_post(request, user_plant_id):
-    
+    user = get_token_user(request)
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(writer = request.user, user_plant=user_plant_id) #1 = request.data, 향후 user_plant_id로 저장할지, request.data로 할지 논의 필요
+        serializer.save(writer = user, user_plant=user_plant_id) #1 = request.data, 향후 user_plant_id로 저장할지, request.data로 할지 논의 필요
         return Response(status = status.HTTP_201_CREATED)
     return Response(status = status.HTTP_400_BAD_REQUEST)
 
@@ -214,8 +212,9 @@ def post_one_post(request, user_plant_id):
 #@permission_classes([IsAuthenticated])
 def put_one_post(request, pk):
     try:
+        user = get_token_user(request)
         post = Post.objects.get(pk=pk)
-        if post.writer == request.user:
+        if post.writer == user:
             serializer = PostWritePutSerializer(post, data = request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -252,8 +251,9 @@ def share(request, pk):
 #@permission_classes([IsAuthenticated])
 def delete_one_post(request, pk):
     try:
+        user = get_token_user(request)
         post = Post.objects.get(pk=pk)
-        if post.writer == request.user:
+        if post.writer == user:
             post.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -266,15 +266,16 @@ def delete_one_post(request, pk):
 #@permission_classes([IsAuthenticated])
 def likes(request, pk):
     try:
+        user = get_token_user(request)
         post = Post.objects.get(pk=pk)
-        if post.like_users.filter(pk=request.user.id).exists():
-            post.like_users.remove(request.user)
+        if post.like_users.filter(pk=user.id).exists():
+            post.like_users.remove(user)
             post.like_num = post.like_users.count()
             post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
             return Response(serializer.data)
         else:
-            post.like_users.add(request.user)
+            post.like_users.add(user)
             post.like_num = post.like_users.count()
             post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
@@ -317,10 +318,11 @@ def get_comments(request, post_id):
 #@permission_classes([IsAuthenticated])
 def post_comment(request, post_id):
     try:
+        user = get_token_user(request)
         serializer = CommentPostSerializer(data=request.data)
         if serializer.is_valid():
-            if request.user.is_authenticated :
-                serializer.save(user=request.user, post_id = post_id)
+            if user.is_authenticated :
+                serializer.save(user=user, post_id = post_id)
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             return Response(status = status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -333,8 +335,9 @@ def post_comment(request, post_id):
 #@permission_classes([IsAuthenticated])
 def delete_comment(request, comment_id):
     try:
+        user = get_token_user(request)
         comment = Comment.objects.get(pk = comment_id)
-        if comment.user == request.user:
+        if comment.user == user:
             comment.delete()
             return Response(status = status.HTTP_200_OK)
         return Response(status = status.HTTP_401_UNAUTHORIZED)
