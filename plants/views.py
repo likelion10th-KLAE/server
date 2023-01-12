@@ -7,6 +7,12 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from datetime import datetime
+from rest_framework_simplejwt.tokens import AccessToken
+
+def get_token_user(request):
+    access_token = AccessToken(request.META.get('HTTP_AUTHORIZATION'))
+    user = User.objects.get(pk=access_token['user_id'])
+    return user
 
 # 등록한 식물 전체 조회
 @api_view(['GET'])
@@ -44,9 +50,10 @@ def plant_get(request, pk):
 #@authentication_classes([SessionAuthentication, BasicAuthentication])
 #@permission_classes([IsAuthenticated])
 def plant_post(request):
+    user = get_token_user(request)
     serializer = PlantGetPostPutSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(user= request.user)
+        serializer.save(user=user)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(status = status.HTTP_400_BAD_REQUEST)
 
@@ -56,8 +63,9 @@ def plant_post(request):
 #@permission_classes([IsAuthenticated])
 def plant_put(request, pk):
     try:
+        user = get_token_user(request)
         plantinfo = UserPlant.objects.get(pk=pk)
-        if plantinfo.user == request.user:
+        if plantinfo.user == user:
             serializer = PlantGetPostPutSerializer(plantinfo, data = request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -73,8 +81,9 @@ def plant_put(request, pk):
 #@permission_classes([IsAuthenticated])
 def delete_userplant(request, plant_id):
     try:
+        user = get_token_user(request)
         plant = UserPlant.objects.get(pk = plant_id)
-        if plant.user == request.user:
+        if plant.user == user:
             plant.delete()
             return Response(status = status.HTTP_200_OK)
         return Response(status = status.HTTP_401_UNAUTHORIZED)
@@ -99,7 +108,8 @@ def recommend(request):
 #@authentication_classes([SessionAuthentication,BasicAuthentication])
 #@permission_classes([IsAuthenticated])
 def get_user_plants(request):
-    plants = UserPlant.objects.filter(user=request.user.id).order_by('-created_at')
+    user = get_token_user(request)
+    plants = UserPlant.objects.filter(user=user.id).order_by('-created_at')
     serializer = UserPlantsSidebar(plants, many=True)
     return Response(serializer.data)
 
