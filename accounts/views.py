@@ -75,6 +75,7 @@ class login(APIView):
                 res = Response(
                     {
                         "user" : serializer.data['email'],
+                        "user_id": str(user.pk),
                         "username": username,
                         "message" : "로그인 성공!",
                         "profile": profile,
@@ -91,6 +92,7 @@ class login(APIView):
                     {
                         "user" : serializer.data['email'],
                         "username": username,
+                        "user_id": str(user.pk),
                         "message" : "로그인 성공!",
                         "profile": "null",
                         "token" : {
@@ -197,8 +199,10 @@ def get_all_posts(request):
 #@permission_classes([IsAuthenticated])
 def get_one_post(request, pk):
     try:
+        user = get_token_user(request)
         post = Post.objects.get(pk=pk)
         comments = Comment.objects.filter(post__id = pk)
+
         userplant = UserPlant.objects.get(pk=post.user_plant)
         post.user_plant_name = userplant.name
         post.comment_cnt = comments.count()
@@ -208,8 +212,31 @@ def get_one_post(request, pk):
         post.ndate = (now - date).days + 1
 
         post.save(update_fields=['comment_cnt', 'ndate', 'user_plant_name'])
+
+        if post.like_users.filter(pk=user.id).exists():
+            bool_like_users = True
+        else:
+            bool_like_users = False
         serializer = GetSerializer(post)
-        return Response(serializer.data)
+        res = Response(
+                {
+                    "bool_like_users": bool_like_users,
+                    "id" : serializer.data['id'],
+                    "title" : serializer.data['title'],
+                    "give_water" : serializer.data['give_water'],
+                    "change_record" : serializer.data['change_record'],
+                    "growing_tonic" : serializer.data['growing_tonic'],
+                    "like_num" : serializer.data['like_num'],
+                    "share" : serializer.data['share'],
+                    "photo" : serializer.data['photo'],
+                    "comment_cnt" : serializer.data['comment_cnt'],
+                    "ndate" : serializer.data['ndate'],
+                    "user_plant_name" : serializer.data['user_plant_name'],
+                    "body" : serializer.data['body']
+                },
+                status = status.HTTP_200_OK
+            )
+        return res
     except Post.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
