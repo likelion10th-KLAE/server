@@ -23,6 +23,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     grow_date_info = models.DateField(null=True)
     like_users = models.ManyToManyField(User, related_name='likepost', null=True)
+    bool_like_users = models.BooleanField(default=False)
     share = models.BooleanField(default=False)
     like_num = models.IntegerField(null=True, default=0)
     photo = models.ImageField(upload_to='post', null=True)
@@ -40,6 +41,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     profile_comment = models.ImageField(null=True)
+    username_comment = models.CharField(max_length=10, null=True)
 
     def __str__(self):
         return self.content

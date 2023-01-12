@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
 class GetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'title', 'body','give_water','change_record', 'growing_tonic', 'like_num', 'share', 'photo', 'comment_cnt', 'ndate', 'user_plant_name']
+        fields = ['id', 'title', 'body','give_water','change_record', 'growing_tonic', 'like_num', 'share', 'photo', 'comment_cnt', 'ndate', 'user_plant_name', 'bool_like_users']
         read_only_fields = ['id']
 
 
@@ -47,13 +47,13 @@ class PostWritePutSerializer(serializers.ModelSerializer):
 class LikeUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'like_num']
+        fields = ['id', 'like_num', 'bool_like_users']
 
 # 댓글 조회
 class CommentGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'user', 'content','created_at','profile_comment']
+        fields = ['id', 'post', 'user', 'content','created_at','profile_comment', 'username_comment']
         read_only_fields = ['id']
 
 # 댓글 작성

@@ -287,13 +287,15 @@ def likes(request, pk):
         if post.like_users.filter(pk=user.id).exists():
             post.like_users.remove(user)
             post.like_num = post.like_users.count()
-            post.save(update_fields=['like_num'])
+            post.bool_like_users = False
+            post.save(update_fields=['like_num', 'bool_like_users'])
             serializer = LikeUsersSerializer(post)
             return Response(serializer.data)
         else:
             post.like_users.add(user)
             post.like_num = post.like_users.count()
-            post.save(update_fields=['like_num'])
+            post.bool_like_users = True
+            post.save(update_fields=['like_num', 'bool_like_users'])
             serializer = LikeUsersSerializer(post)
             return Response(serializer.data)
     except Post.DoesNotExist:
@@ -338,7 +340,7 @@ def post_comment(request, post_id):
         serializer = CommentPostSerializer(data=request.data)
         if serializer.is_valid():
             if user.is_authenticated :
-                serializer.save(user=user, post_id = post_id)
+                serializer.save(user=user, post_id = post_id, username_comment=user.username)
                 return Response(serializer.data, status = status.HTTP_201_CREATED)
             return Response(status = status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
