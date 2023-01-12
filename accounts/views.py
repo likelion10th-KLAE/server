@@ -75,7 +75,7 @@ class login(APIView):
                 res = Response(
                     {
                         "user" : serializer.data['email'],
-                        "user_id": str(user.pk),
+                        "userid": str(user.pk),
                         "username": username,
                         "message" : "로그인 성공!",
                         "profile": profile,
@@ -92,7 +92,7 @@ class login(APIView):
                     {
                         "user" : serializer.data['email'],
                         "username": username,
-                        "user_id": str(user.pk),
+                        "userid": str(user.pk),
                         "message" : "로그인 성공!",
                         "profile": "null",
                         "token" : {
