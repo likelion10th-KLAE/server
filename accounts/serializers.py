@@ -47,7 +47,7 @@ class PostWritePutSerializer(serializers.ModelSerializer):
 class LikeUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'like_num', 'bool_like_users']
+        fields = ['id', 'like_num']
 
 # 댓글 조회
 class CommentGetSerializer(serializers.ModelSerializer):
