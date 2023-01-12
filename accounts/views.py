@@ -69,11 +69,13 @@ class login(APIView):
             token = TokenObtainPairSerializer.get_token(user)
             refresh_token = str(token)
             access_token = str(token.access_token)
+            username = str(user.username)
             if user.profile_image:
                 profile = str(user.profile_image.url)
                 res = Response(
                     {
                         "user" : serializer.data['email'],
+                        "username": username,
                         "message" : "로그인 성공!",
                         "profile": profile,
                         "token" : {
@@ -88,6 +90,7 @@ class login(APIView):
                 res = Response(
                     {
                         "user" : serializer.data['email'],
+                        "username": username,
                         "message" : "로그인 성공!",
                         "profile": "null",
                         "token" : {
