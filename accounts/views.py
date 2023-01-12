@@ -12,6 +12,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from datetime import datetime
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import AccessToken
 #from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 '''
@@ -21,6 +22,13 @@ from rest_framework.views import APIView
 """
 토큰회원가입
 """
+
+def get_token_user(request):
+    access_token = AccessToken(request.META.get('HTTP_AUTHORIZATION'))
+    user = User.objects.get(pk=access_token['user_id'])
+    return user
+
+
 class signup(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -61,11 +69,12 @@ class login(APIView):
             token = TokenObtainPairSerializer.get_token(user)
             refresh_token = str(token)
             access_token = str(token.access_token)
+            profile = str(user.profile_image.url)
             res = Response(
                 {
                     "user" : serializer.data['email'],
                     "message" : "로그인 성공!",
-                    "profile": user.profile_image,
+                    "profile": profile,
                     "token" : {
                         "access" : access_token,
                         "refresh" : refresh_token,
@@ -84,7 +93,7 @@ class login(APIView):
 #@permission_classes([IsAuthenticated])
 def mypage(request):
     try:
-        user = User.objects.get(pk=request.user.id)
+        user = get_token_user(request)
         serializer = MypageSerializers(user)
         return Response(serializer.data)
     except User.DoesNotExist:
@@ -96,7 +105,7 @@ def mypage(request):
 #@permission_classes([IsAuthenticated])
 def mypage_put(request):
     try:
-        user = User.objects.get(pk=request.user.id)
+        user = get_token_user(request)
         if user == request.user:
             serializer = MypagePutserializers(user, data=request.data)
             if serializer.is_valid():
@@ -192,6 +201,7 @@ def get_one_post(request, pk):
 #@authentication_classes([SessionAuthentication, BasicAuthentication])
 #@permission_classes([IsAuthenticated])
 def post_one_post(request, user_plant_id):
+    
     serializer = PostWritePutSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(writer = request.user, user_plant=user_plant_id) #1 = request.data, 향후 user_plant_id로 저장할지, request.data로 할지 논의 필요
