@@ -69,20 +69,36 @@ class login(APIView):
             token = TokenObtainPairSerializer.get_token(user)
             refresh_token = str(token)
             access_token = str(token.access_token)
-            profile = str(user.profile_image.url)
-            res = Response(
-                {
-                    "user" : serializer.data['email'],
-                    "message" : "로그인 성공!",
-                    "profile": profile,
-                    "token" : {
-                        "access" : access_token,
-                        "refresh" : refresh_token,
+            if user.profile_image:
+                profile = str(user.profile_image.url)
+                res = Response(
+                    {
+                        "user" : serializer.data['email'],
+                        "message" : "로그인 성공!",
+                        "profile": profile,
+                        "token" : {
+                            "access" : access_token,
+                            "refresh" : refresh_token,
+                        },
                     },
-                },
-                status=status.HTTP_200_OK
-            )
-            return res
+                    status=status.HTTP_200_OK
+                )
+                return res
+            else:
+                res = Response(
+                    {
+                        "user" : serializer.data['email'],
+                        "message" : "로그인 성공!",
+                        "profile": "null",
+                        "token" : {
+                            "access" : access_token,
+                            "refresh" : refresh_token,
+                        },
+                    },
+                    status=status.HTTP_200_OK
+                )
+                return res
+
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
