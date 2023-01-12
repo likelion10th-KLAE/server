@@ -290,17 +290,29 @@ def likes(request, pk):
         if post.like_users.filter(pk=user.id).exists():
             post.like_users.remove(user)
             post.like_num = post.like_users.count()
-            post.bool_like_users = False
-            post.save(update_fields=['like_num', 'bool_like_users'])
+            post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
-            return Response(serializer.data)
+            res = Response(
+                {
+                    "like_num" : serializer.data['like_num'],
+                    "bool_like_users" : False
+                },
+                status = status.HTTP_200_OK
+            )
+            return res
         else:
             post.like_users.add(user)
             post.like_num = post.like_users.count()
-            post.bool_like_users = True
-            post.save(update_fields=['like_num', 'bool_like_users'])
+            post.save(update_fields=['like_num'])
             serializer = LikeUsersSerializer(post)
-            return Response(serializer.data)
+            res = Response(
+                {
+                    "like_num" : serializer.data['like_num'],
+                    "bool_like_users" : True
+                },
+                status = status.HTTP_200_OK
+            )
+            return res
     except Post.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
