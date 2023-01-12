@@ -112,7 +112,7 @@ class login(APIView):
 
 #마이페이지 조회
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
+#@authentication_classes([JWTAuthentication])
 #@permission_classes([IsAuthenticated])
 def mypage(request):
     try:
@@ -162,7 +162,7 @@ def get_page_posts(request, page):
 
 #일지공유게시판 최신 4개
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
+#@authentication_classes([JWTAuthentication])
 #@permission_classes([IsAuthenticated])
 def new_4_posts(request):
     posts = Post.objects.filter(share=True).order_by('-created_at')
