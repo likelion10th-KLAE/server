@@ -13,6 +13,8 @@ from datetime import datetime
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 #from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 '''
@@ -110,7 +112,7 @@ class login(APIView):
 
 #마이페이지 조회
 @api_view(['GET'])
-#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@authentication_classes([JWTAuthentication])
 #@permission_classes([IsAuthenticated])
 def mypage(request):
     try:
@@ -160,7 +162,7 @@ def get_page_posts(request, page):
 
 #일지공유게시판 최신 4개
 @api_view(['GET'])
-#@authentication_classes([SessionAuthentication,BasicAuthentication])
+#@authentication_classes([JWTAuthentication])
 #@permission_classes([IsAuthenticated])
 def new_4_posts(request):
     posts = Post.objects.filter(share=True).order_by('-created_at')
@@ -201,6 +203,11 @@ def get_one_post(request, pk):
     try:
         user = get_token_user(request)
         post = Post.objects.get(pk=pk)
+        if post.writer.profile_image:
+            profile_image = str(post.writer.profile_image.url)
+        else:
+            profile_image = "null"
+        writer = str(post.writer.username)
         comments = Comment.objects.filter(post__id = pk)
 
         userplant = UserPlant.objects.get(pk=post.user_plant)
@@ -232,7 +239,10 @@ def get_one_post(request, pk):
                     "comment_cnt" : serializer.data['comment_cnt'],
                     "ndate" : serializer.data['ndate'],
                     "user_plant_name" : serializer.data['user_plant_name'],
-                    "body" : serializer.data['body']
+                    "body" : serializer.data['body'],
+                    "writer": writer,
+                    "profile_image": profile_image
+
                 },
                 status = status.HTTP_200_OK
             )
