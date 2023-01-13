@@ -21,7 +21,7 @@ class UserPlant(models.Model):
     water_amount = models.IntegerField(default=0, null = True, blank = True )
     repot = models.IntegerField(default=0, null = True, blank = True )
     light = models.IntegerField(default=0, null = True, blank = True )
-    temperature = models.CharField(max_length=7, null = True, blank = True )
+    temperature = models.IntegerField(default=0, null = True, blank = True )
     start_date = models.IntegerField(default=0, null = True, blank = True )
     last_watered = models.IntegerField(default=0, null = True, blank = True )
     created_at= models.DateTimeField(auto_now_add=True)
