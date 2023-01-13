@@ -134,7 +134,7 @@ def mypage_put(request):
         if serializer.is_valid():
             serializer.save(password = make_password(serializer.validated_data['password']))
             return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(status = status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
