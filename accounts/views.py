@@ -196,6 +196,22 @@ def get_all_posts(request):
     serializer = GetSerializer(posts, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def likes_test(request):
+    target_post = Post.objects.get(pk=2)
+    target_post = target_post.like_users.all()
+    target_postDict = [i.id for i in target_post]
+
+    target_user = User.objects.get(pk=3)
+    target_user = target_user.likepost.all()
+    target_user = [i.id for i in target_user]
+    return Response(
+        {
+            "target_postDict": target_postDict,
+            "target_user": target_user
+        }
+    )
+
 #한 게시물 조회
 @api_view(['GET'])
 #@authentication_classes([SessionAuthentication, BasicAuthentication])
