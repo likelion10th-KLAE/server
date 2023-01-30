@@ -31,5 +31,6 @@ urlpatterns = [
     path('get_userplant_post/<int:user_plant_id>', views.get_userplant_post),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify', TokenVerifyView.as_view(), name='token_verify')
+    path('api/token/verify', TokenVerifyView.as_view(), name='token_verify'),
+    path('post/likes_test/', views.likes_test),
 ]
